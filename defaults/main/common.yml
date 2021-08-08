@@ -1,0 +1,3 @@
+---
+swift_retries: 10
+swift_delay: 5

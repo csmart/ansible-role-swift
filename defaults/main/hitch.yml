@@ -1,0 +1,7 @@
+---
+swift_hitch_conf:
+  frontend:
+    host: "*"
+    port: 443
+  user: hitch
+  group: hitch

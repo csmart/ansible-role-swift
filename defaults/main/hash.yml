@@ -1,0 +1,4 @@
+---
+# This must be set before the cluster is built and must not change thereafter
+swift_hash_suffix: 07b4ef9c-2e01-4ea2-a109-5ffc5273225f
+swift_hash_prefix: f9175259-ace0-48bb-af9d-e7ac505b89d2

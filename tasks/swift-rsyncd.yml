@@ -1,0 +1,29 @@
+---
+- name: Install rsync
+  package:
+    name:
+      - rsync
+      - rsync-daemon
+    state: present
+  become: true
+  register: result_swift_rsync_install
+  retries: "{{ swift_retries }}"
+  delay: "{{ swift_delay }}"
+  until: result_swift_rsync_install is succeeded
+  tags:
+    - prep
+    - rsyncd
+
+- name: Configure rsyncd
+  template:
+    src: rsyncd_rsyncd.conf.j2
+    dest: /etc/rsyncd.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart rsync server"
+  tags:
+    - prep
+    - rsyncd

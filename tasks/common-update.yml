@@ -1,0 +1,19 @@
+---
+- name: Common update tasks
+  tags:
+    - common
+    - update
+  block:
+  - name: Upgrade all packages
+    package:
+      name: '*'
+      state: latest
+    become: true
+    register: result_package_update
+    retries: "{{ swift_retries }}"
+    delay: "{{ swift_delay }}"
+    until: result_package_update is succeeded
+
+  - name: Reboot nodes after updates
+    reboot:
+    become: true

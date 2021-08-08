@@ -1,0 +1,17 @@
+---
+- name: Configure Swift account service
+  template:
+    src: swift-account-server.conf.j2
+    dest: /etc/swift/account-server.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_account']"
+  notify: "restart openstack swift account server"
+  tags:
+    - account
+    - config
+    - services

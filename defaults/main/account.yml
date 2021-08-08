@@ -1,0 +1,26 @@
+---
+swift_account_port: 6202
+swift_account_workers: auto
+
+swift_account_pipeline:
+  recon: "{{ swift_account_pipeline_recon | default(true) }}"
+  account-server: "{{ swift_account_pipeline_account_server | default(true) }}"
+
+swift_account_server_conf:
+  DEFAULT:
+    bind_ip: "{{ swift_cluster_ip }}"
+    bind_port: "{{ swift_account_port }}"
+    workers: "{{ swift_account_workers }}"
+    user: "{{ swift_user }}"
+  pipeline:
+    main:
+     pipeline: "{% for item in swift_account_pipeline %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}"
+  filter:
+    recon:
+      use: egg:swift#recon
+  app:
+    account-server:
+      use: egg:swift#account
+  account-replicator: {}
+  account-auditor: {}
+  account-reaper: {}
