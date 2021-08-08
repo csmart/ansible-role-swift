@@ -1,0 +1,44 @@
+global_defs {
+   router_id {{ server_ip }}
+   enable_script_security
+   script_user swift
+   vrrp_priority -15
+   checker_priority -10
+   vrrp_no_swap
+   checker_no_swap
+}
+
+vrrp_script chk_proxy {
+  script "/bin/bash -c 'set -e ; curl -I -skg -m 10 --connect-timeout 2 https://127.0.0.1/healthcheck'"
+
+  interval 5
+  timeout 11
+  fail 2
+  rise 1
+}
+
+{% for vip in swift_vips %}
+vrrp_instance VI_{{ vip }} {
+{% if loop.index0 == 0 %}
+    state MASTER
+    priority 100
+{% else %}
+    state BACKUP
+    priority {{ 100 - loop.index0 }}
+{% endif %}
+    interface eth0
+    virtual_router_id {{ vip }}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass {{ vip }}
+    }
+    virtual_ipaddress {
+        {{ swift_outward_subnet | next_nth_usable(vip) }}
+    }
+    track_script {
+        chk_proxy
+    }
+}
+
+{% endfor %}

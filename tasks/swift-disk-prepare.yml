@@ -1,0 +1,91 @@
+---
+- name: Disk prepare
+  block:
+    - name: Match disk on node to Swift ID
+      shell:
+        cmd: swift-ring-builder /etc/swift/{{ item }}.builder search --region 1 --zone 1 --ip {{ swift_cluster_ip }} |grep -v Devices | awk '{print $1,$8}'
+      delegate_to: swift-admin
+      become: true
+      become_user: "{{ swift_user }}"
+      register: res_swift_devices
+      changed_when: false
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      with_items:
+        - account
+        - container
+        - object
+
+    - name: Gather all disks in a list
+      set_fact:
+        swift_disks_list: "{{ (swift_disks_list | default([]) + item.stdout_lines) |unique }}"
+        cacheable: yes
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      with_items: "{{ res_swift_devices.results }}"
+
+    - name: Ensure directory exists for disks
+      file:
+        path: "/srv/node"
+        state: directory
+        owner: "{{ swift_user }}"
+        group: "{{ swift_group }}"
+        mode: 0770
+      become: true
+      when:
+        - 'inventory_hostname != "swift-admin"'
+
+    - name: Ensure directory exists for each disk
+      file:
+        path: "/srv/node/{{ item.split()[1] }}"
+        state: directory
+        owner: "{{ swift_user }}"
+        group: "{{ swift_group }}"
+        mode: 0770
+      become: true
+      with_items: "{{ swift_disks_list }}"
+      when:
+        - 'inventory_hostname != "swift-admin"'
+
+    # format the disk if not already formatted
+    - name: Format disks
+      filesystem:
+        fstype: xfs
+        force: false
+        dev: "/dev/{{ item.split()[1] }}"
+        opts: "-d sunit=512,swidth=512 -L '{{ item.split()[1] }}'"
+      become: true
+      with_items: "{{ swift_disks_list }}"
+      when:
+        - 'inventory_hostname != "swift-admin"'
+
+    # mount the disk
+    - name: Mount the drives
+      mount:
+        path: "/srv/node/{{ item.split()[1] }}"
+        src: "LABEL={{ item.split()[1] }}"
+        fstype: xfs
+        state: mounted
+        opts: "rw,noatime,nodiratime,seclabel,attr2,inode64,logbufs=8,sunit=512,swidth=512,noquota"
+      become: true
+      with_items: "{{ swift_disks_list }}"
+      when:
+        - 'inventory_hostname != "swift-admin"'
+
+    - name: Ensure permissions on each disk mount
+      file:
+        path: "/srv/node/{{ item.split()[1] }}"
+        state: directory
+        owner: "{{ swift_user }}"
+        group: "{{ swift_group }}"
+        mode: 0770
+      become: true
+      with_items: "{{ swift_disks_list }}"
+      when:
+        - 'inventory_hostname != "swift-admin"'
+
+    # if fail, do we take it out of the ring?
+    # you can push the ring and rebalance
+  tags:
+    - disks
+    - rings

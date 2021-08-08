@@ -1,0 +1,13 @@
+---
+- name: Configure Swift base config
+  template:
+    src: swift-swift.conf.j2
+    dest: /etc/swift/swift.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  tags:
+    - config
+    - prep

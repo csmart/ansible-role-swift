@@ -1,0 +1,26 @@
+---
+- name: Install dependencies for Swift
+  package:
+    name: "{{ swift_deps }}"
+    state: present
+  become: true
+  register: result_swift_deps_install
+  retries: 30
+  delay: 10
+  until: result_swift_deps_install is succeeded
+  tags:
+    - packages
+    - prep
+
+- name: Install packages for Swift
+  package:
+    name: "{{ swift_packages }}"
+    state: present
+  become: true
+  register: result_swift_packages_install
+  retries: 30
+  delay: 10
+  until: result_swift_packages_install is succeeded
+  tags:
+    - packages
+    - prep

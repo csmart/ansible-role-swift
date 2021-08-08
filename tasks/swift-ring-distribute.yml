@@ -1,0 +1,45 @@
+---
+- name: Swift ring distribute
+  block:
+    - name: Push account ring to cluster
+      synchronize:
+        src: /etc/swift/{{ item.name }}.ring.gz
+        dest: /etc/swift/{{ item.name }}.ring.gz
+      loop: "{{ swift_account_rings }}"
+      delegate_to: swift-admin
+      become: true
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      notify:
+        - "restart openstack swift proxy server"
+        - "restart openstack swift account server"
+
+    - name: Push container ring to cluster
+      synchronize:
+        src: /etc/swift/{{ item.name }}.ring.gz
+        dest: /etc/swift/{{ item.name }}.ring.gz
+      loop: "{{ swift_container_rings }}"
+      delegate_to: swift-admin
+      become: true
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      notify:
+        - "restart openstack swift proxy server"
+        - "restart openstack swift container server"
+
+    - name: Push object rings to cluster
+      synchronize:
+        src: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.ring.gz
+        dest: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.ring.gz
+      loop: "{{ swift_object_rings }}"
+      loop_control:
+        index_var: loop_index
+      delegate_to: swift-admin
+      become: true
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      notify:
+        - "restart openstack swift proxy server"
+        - "restart openstack swift object server"
+  tags:
+    - rings

@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  role_name: swift
+  namespace: csmart
+  author: Chris Smart
+  description: Define and manage guests and networks on a KVM host with Ansible
+  company: Cloudseed
+
+  license: GPLv3
+
+  min_ansible_version: 2.9
+  platforms:
+    - name: EL
+      versions:
+        - 8
+
+  galaxy_tags:
+    - cloud
+    - infra
+    - infrastructure
+    - object
+    - openstack
+    - storage
+    - swift
+
+dependencies: []

@@ -1,0 +1,52 @@
+---
+swift_object_port: 6200
+swift_object_workers: auto
+
+swift_object_pipeline:
+  recon: "{{ swift_object_pipeline_recon | default(true) }}"
+  object-server: "{{ swift_object_pipeline_object_server | default(true) }}"
+
+swift_object_expirer_pipeline:
+  catch_errors: "{{ swift_object_expirer_pipeline_catch_errors | default(true) }}"
+  proxy-logging: "{{ swift_object_expirer_pipeline_proxy_logging | default(true) }}"
+  cache: "{{ swift_object_expirer_pipeline_cache | default(true) }}"
+  proxy-server: "{{ swift_object_expirer_pipeline_proxy_server | default(true) }}"
+
+swift_object_server_conf:
+  DEFAULT:
+    bind_ip: "{{ swift_cluster_ip }}"
+    bind_port: "{{ swift_object_port }}"
+    workers: "{{ swift_object_workers }}"
+    user: "{{ swift_user }}"
+    mount_check: true
+    #servers_per_port: "{{ swift_object_servers_per_port | default(1) }}"
+  pipeline:
+    main:
+      pipeline: "{% for item in swift_object_pipeline %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}"
+  app:
+    object-server:
+      use: egg:swift#object
+  filter:
+    recon:
+      use: egg:swift#recon
+  object-replicator: {}
+  object-updater: {}
+  object-auditor: {}
+  object-reconstructor: {}
+
+swift_object_expirer_conf:
+  DEFAULT:
+  object-expirer: {}
+  pipeline:
+    main:
+      pipeline: "{% for item in swift_object_expirer_pipeline %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}"
+  app:
+    object-server:
+      use: egg:swift#proxy
+  filter:
+    cache:
+      use: egg:swift#memcache
+    catch_errors:
+      use: egg:swift#catch_errors
+    proxy-logging:
+      use: egg:swift#proxy_logging

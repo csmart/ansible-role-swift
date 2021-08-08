@@ -1,0 +1,29 @@
+---
+swift_container_port: 6201
+swift_container_workers: auto
+
+swift_container_pipeline:
+  recon: "{{ swift_container_pipeline_recon | default(true) }}"
+  container-server: "{{ swift_container_pipeline_container_server | default(true) }}"
+
+swift_container_server_conf:
+  DEFAULT:
+    bind_ip: "{{ swift_cluster_ip }}"
+    bind_port: "{{ swift_container_port }}"
+    workers: "{{ swift_container_workers }}"
+    user: "{{ swift_user }}"
+    mount_check: true
+  pipeline:
+    main:
+      pipeline: "{% for item in swift_container_pipeline %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}"
+  app:
+    container-server:
+      use: egg:swift#container
+  filter:
+    recon:
+      use: egg:swift#recon
+  container-replicator: {}
+  container-updater: {}
+  container-auditor: {}
+  container-sync: {}
+  container-sharder: {}

@@ -1,0 +1,14 @@
+---
+- name: Add required Swift repositories
+  yum_repository:
+    name: "{{ item }}"
+    state: enabled
+  become: true
+  register: result_swift_repos_enable
+  retries: 30
+  delay: 10
+  until: result_swift_repos_enable is succeeded
+  loop: "{{ swift_repos }}"
+  tags:
+    - packages
+    - prep

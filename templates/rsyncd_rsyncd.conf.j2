@@ -1,0 +1,25 @@
+uid = {{ swift_user | default('swift') }}
+gid = {{ swift_group | default('swift') }}
+reverse lookup = false
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+address = {{ swift_cluster_ip }}
+max connections = {{ swift_rsyncd_maxconn | default(4) }}
+
+[account]
+max connections = 2
+path = /srv/node
+read only = false
+lock file = /var/lock/account.lock
+
+[container]
+max connections = 2
+path = /srv/node
+read only = false
+lock file = /var/lock/container.lock
+
+[object]
+max connections = 2
+path = /srv/node
+read only = false
+lock file = /var/lock/object.lock

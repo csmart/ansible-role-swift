@@ -1,0 +1,43 @@
+---
+- name: Install memcached
+  package:
+    name: memcached
+    state: present
+  become: true
+  register: result_swift_memcached_install
+  retries: 30
+  delay: 10
+  until: result_swift_memcached_install is succeeded
+  tags:
+    - prep
+    - memcached
+
+- name: Configure memcached
+  template:
+    src: memcached_memcached.j2
+    dest: /etc/sysconfig/memcached
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart memcache server"
+  tags:
+    - prep
+    - memcached
+
+- name: Configure Swift memcache settings
+  template:
+    src: swift-memcache.conf.j2
+    dest: /etc/swift/memcache.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+  notify: "restart openstack swift proxy server"
+  tags:
+    - prep
+    - memcached

@@ -1,0 +1,89 @@
+---
+- name: Prepare Swift hosts
+  block:
+    - name: Generate SSH admin key
+      openssh_keypair:
+        path: /root/.ssh/id_rsa
+        type: rsa
+        size: 2048
+        state: present
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      register: res_swift_sshkeygen
+      become: true
+
+    - name: Set the public key
+      set_fact:
+        swift_admin_ssh_public_key: "{{ res_swift_sshkeygen.public_key }}"
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      run_once: true
+
+    - name: Copy SSH admin public key to nodes
+      authorized_key:
+        user: root
+        state: present
+        key: "{{ swift_admin_ssh_public_key }}"
+      become: true
+
+    - name: Wait for nodes to be contactable via SSH
+      wait_for:
+        port: 22
+        host: "{{ swift_cluster_ip }}"
+        search_regex: OpenSSH
+        timeout: 600
+      delegate_to: swift-admin
+
+    - name: Get node SSH fingerprints
+      shell: "set -o pipefail && ssh-keyscan {{ inventory_hostname }} {{ swift_cluster_ip }} | sort"
+      args:
+        executable: /bin/bash
+      delegate_to: swift-admin
+      register: result_keyscan
+      changed_when: false
+
+    - name: Add guest fingerprint to SSH known_hosts
+      blockinfile:
+        create: true
+        mode: 0600
+        state: present
+        path: "/root/.ssh/known_hosts"
+        marker: "# {mark} {{ hostvars[item]['inventory_hostname'] }} managed by OpineStack Ansible playbook"
+        block: |-
+          {{ hostvars[item]['result_keyscan']['stdout'] }}
+      become: true
+      changed_when: false
+      delegate_to: swift-admin
+      with_items: "{{ play_hosts }}"
+      run_once: true
+
+    - name: Update /etc/hosts to resolve new nodes
+      blockinfile:
+        path: /etc/hosts
+        state: present
+        marker: "# {mark} {{ hostvars[item]['inventory_hostname'] }} managed by OpineStack Ansible playbook"
+        block: |-
+          {{ hostvars[item]['swift_cluster_ip'] }} {{ hostvars[item]['inventory_hostname'] }}
+      become: true
+      delegate_to: swift-admin
+      with_items: "{{ play_hosts }}"
+      run_once: true
+
+    - name: Add host to SSH config
+      blockinfile:
+        create: true
+        mode: 0600
+        state: present
+        path: "/root/.ssh/config"
+        marker: "# {mark} {{ hostvars[item]['inventory_hostname'] }} managed by OpineStack Ansible playbook"
+        block: |-
+          Host {{ hostvars[item]['swift_cluster_ip'] }} {{ hostvars[item]['inventory_hostname'] }}
+            Hostname  {{ hostvars[item]['swift_cluster_ip'] }}
+            IdentityFile /root/.ssh/id_rsa
+      become: true
+      delegate_to: swift-admin
+      with_items: "{{ play_hosts }}"
+      run_once: true
+  tags:
+    - hosts
+    - prep

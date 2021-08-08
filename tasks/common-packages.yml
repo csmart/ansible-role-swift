@@ -1,0 +1,26 @@
+---
+- name: Install common dependencies
+  package:
+    name: "{{ swift_common_deps }}"
+    state: present
+  become: true
+  register: result_swift_deps_install
+  retries: 30
+  delay: 10
+  until: result_swift_deps_install is succeeded
+  tags:
+    - common
+    - packages
+
+- name: Install common packages
+  package:
+    name: "{{ swift_common_packages }}"
+    state: present
+  become: true
+  register: result_package_install
+  retries: 30
+  delay: 10
+  until: result_package_install is succeeded
+  tags:
+    - common
+    - packages

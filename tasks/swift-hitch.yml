@@ -1,0 +1,48 @@
+---
+- name: Ensure EPEL is enabled
+  package:
+    name:
+      - epel-release
+    state: present
+  become: true
+  register: result_swift_epel_install
+  retries: 30
+  delay: 10
+  until: result_swift_epel_install is succeeded
+  tags:
+    - prep
+    - hitch
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+
+- name: Install hitch
+  package:
+    name:
+      - hitch
+    state: present
+  become: true
+  register: result_swift_hitch_install
+  retries: 30
+  delay: 10
+  until: result_swift_hitch_install is succeeded
+  tags:
+    - prep
+    - hitch
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+
+- name: Configure hitch
+  template:
+    src: hitch_hitch.conf.j2
+    dest: /etc/hitch/hitch.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart hitch server"
+  tags:
+    - prep
+    - hitch
+  when:
+    - "inventory_hostname in groups['swift_proxy']"

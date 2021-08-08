@@ -1,0 +1,30 @@
+---
+# swift-prep
+- name: Swift preparation
+  block:
+    - include_tasks: swift-hosts.yml
+      tags:
+        - hosts
+    - include_tasks: swift-system.yml
+      tags:
+        - system
+    - include_tasks: swift-repos.yml
+      tags:
+        - packages
+    - include_tasks: swift-packages.yml
+      tags:
+        - packages
+    - include_tasks: common-logging.yml
+      tags:
+        - logging
+    - include_tasks: swift-memcached.yml
+      tags:
+        - memcached
+    - include_tasks: swift-rsyncd.yml
+      tags:
+        - rsyncd
+    - include_tasks: swift-config.yml
+      tags:
+        - config
+  tags:
+    - prep

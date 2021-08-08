@@ -1,0 +1,4 @@
+---
+swift_memcache_conf:
+  memcache:
+    memcache_servers: "{% for memcached in groups['swift_proxy'] %}{{ hostvars[memcached]['swift_cluster_ip'] }}:11211{% if not loop.last %},{% endif %}{% endfor %}"

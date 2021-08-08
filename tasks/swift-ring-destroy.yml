@@ -1,0 +1,48 @@
+---
+- name: Delete account ring
+  file:
+    path: /etc/swift/account.ring.gz
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+
+- name: Delete container ring
+  file:
+    path: /etc/swift/container.ring.gz
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+
+- name: Delete object rings
+  file:
+    path: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.ring.gz
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+  loop: "{{ swift_object_rings }}"
+  loop_control:
+    index_var: loop_index
+
+- name: Delete account builder
+  file:
+    path: /etc/swift/account.builder
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+
+- name: Delete container builder
+  file:
+    path: /etc/swift/container.builder
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+
+- name: Delete object builders
+  file:
+    path: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder
+    state: absent
+  become: true
+  become_user: "{{ swift_user }}"
+  loop: "{{ swift_object_rings }}"
+  loop_control:
+    index_var: loop_index
