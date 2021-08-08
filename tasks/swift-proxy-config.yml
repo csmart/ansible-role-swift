@@ -1,0 +1,17 @@
+---
+- name: Configure Swift proxy service
+  template:
+    src: swift-proxy-server.conf.j2
+    dest: /etc/swift/proxy-server.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+  notify: "restart openstack swift proxy server"
+  tags:
+    - config
+    - proxy
+    - services

@@ -1,0 +1,6 @@
+---
+swift_account_rings:
+  - name: account
+    part_power: "{{ swift_account_rings_part_power | default(10) }}"
+    replicas: "{{ swift_account_rings_replicas | default(3) }}"
+    min_part_hours: "{{ swift_account_rings_min_part_hours | default(0) }}"

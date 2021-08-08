@@ -1,0 +1,27 @@
+---
+- name: Install rsyslog
+  package:
+    name: rsyslog
+    state: present
+  become: true
+  register: result_swift_rsyslog_install
+  retries: 30
+  delay: 10
+  until: result_swift_rsyslog_install is succeeded
+  tags:
+    - logging
+    - prep
+
+- name: Configure logging for services
+  template:
+    src: rsyslog_openstack-swift.conf.j2
+    dest: /etc/rsyslog.d/openstack-swift.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart logging server"
+  tags:
+    - logging
+    - prep

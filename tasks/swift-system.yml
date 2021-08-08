@@ -1,0 +1,51 @@
+---
+- name: Prepare Swift system
+  block:
+    - name: Create Swift group
+      ansible.builtin.group:
+        name: "{{ swift_group | default('swift') }}"
+        state: present
+        gid: "{{ swift_gid | default(160) }}"
+        system: true
+      become: true
+
+    - name: Create Swift service account
+      ansible.builtin.user:
+        name: "{{ swift_user | default('swift') }}"
+        expires: -1
+        state: present
+        group: "{{ swift_group | default('swift') }}"
+        groups: "{{ swift_groups | default('swift') }}"
+        uid: "{{ swift_uid | default(160) }}"
+        system: true
+        home: /var/lib/swift
+        shell: /sbin/nologin
+        password_lock: true
+        comment: "OpenStack Swift Daemons"
+        create_home: true
+        # think about SSH keys
+      become: true
+
+    #- name: Enable sudo for Swift service account
+    #  template:
+    #    src: sudoers_swift.j2
+    #    dest: /etc/sudoers.d/01_swift
+    #    validate: "/usr/sbin/visudo -cf %s"
+    #    owner: root
+    #    group: root
+    #    mode: 0600
+    #    backup: true
+    #  become: true
+    #
+    - name: Configure tmpfiles for swift
+      template:
+        src: tmpfiles_swift.conf.j2
+        dest: /etc/tmpfiles.d/swift.conf
+        owner: "{{ swift_user }}"
+        group: "{{ swift_group }}"
+        mode: 0640
+        backup: true
+      become: true
+  tags:
+    - prep
+    - system

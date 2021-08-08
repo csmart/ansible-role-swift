@@ -1,0 +1,23 @@
+---
+# common
+- name: Swift common tasks
+  block:
+    - include_tasks: common-selinux.yml
+      tags:
+        - selinux
+
+    - include_tasks: common-update.yml
+      when:
+        - swift_update is defined and (swift_update | bool == true)
+      tags:
+        - update
+
+    - include_tasks: common-repos.yml
+      tags:
+        - packages
+
+    - include_tasks: common-packages.yml
+      tags:
+        - packages
+  tags:
+    - common

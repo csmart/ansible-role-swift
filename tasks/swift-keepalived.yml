@@ -1,0 +1,29 @@
+---
+- name: Install keepalived
+  package:
+    name:
+      - keepalived
+    state: present
+  become: true
+  register: result_swift_keepalived_install
+  retries: 30
+  delay: 10
+  until: result_swift_keepalived_install is succeeded
+  tags:
+    - keepalived
+    - services
+
+- name: Configure keepalived
+  template:
+    src: keepalived_keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart keepalived server"
+  when: swift_vips is defined and swift_vips is iterable
+  tags:
+    - keepalived
+    - services

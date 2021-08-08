@@ -1,0 +1,97 @@
+---
+swift_proxy_port: 8080
+swift_proxy_workers: auto
+## NOTE: pipelines have specific ordering conditions
+swift_proxy_pipeline:
+  authtoken: "{{ swift_proxy_pipeline_authtoken | default(false) }}"
+  keystoneauth: "{{ swift_proxy_pipeline_keystoneauth | default(false) }}"
+  s3api: "{{ swift_proxy_pipeline_s3api | default(false) }}"
+  s3token: "{{ swift_proxy_pipeline_s3token | default(false) }}"
+  read_only: "{{ swift_proxy_pipeline_read_only | default(false) }}"
+  domain_remap: "{{ swift_proxy_pipeline_domain_remap | default(false) }}"
+  cname_lookup: "{{ swift_proxy_pipeline_cname_lookup | default(false) }}"
+  staticweb: "{{ swift_proxy_pipeline_staticweb | default(false) }}"
+  formpost: "{{ swift_proxy_pipeline_formpost | default(false) }}"
+  name_check: "{{ swift_proxy_pipeline_name_check | default(false) }}"
+  etag-quoter: "{{ swift_proxy_pipeline_etag_quoter | default(false) }}"
+  list-endpoints: "{{ swift_proxy_pipeline_list_endpoints | default(false) }}"
+  xprofile: "{{ swift_proxy_pipeline_xprofile | default(false) }}"
+  kms_keymaster: "{{ swift_proxy_pipeline_kms_keymaster | default(false) }}"
+  kmip_keymaster: "{{ swift_proxy_pipeline_kmip_keymaster | default(false) }}"
+  catch_errors: "{{ swift_proxy_pipeline_catch_errors | default(true) }}"
+  gatekeeper: "{{ swift_proxy_pipeline_gatekeeper | default(true) }}"
+  healthcheck: "{{ swift_proxy_pipeline_healthcheck | default(true) }}"
+  cache: "{{ swift_proxy_pipeline_cache | default(true) }}"
+  listing_formats: "{{ swift_proxy_pipeline_listing_formats | default(true) }}"
+  container_sync: "{{ swift_proxy_pipeline_container_sync | default(true) }}"
+  bulk: "{{ swift_proxy_pipeline_bulk | default(true) }}"
+  tempurl: "{{ swift_proxy_pipeline_tempurl | default(true) }}"
+  ratelimit: "{{ swift_proxy_pipeline_ratelimit | default(true) }}"
+  tempauth: "{{ swift_proxy_pipeline_tempauth | default(true) }}"
+  container-quotas: "{{ swift_proxy_pipeline_container_quotas | default(true) }}"
+  account-quotas: "{{ swift_proxy_pipeline_account_quotas | default(true) }}"
+  copy: "{{ swift_proxy_pipeline_copy | default(true) }}"
+  slo: "{{ swift_proxy_pipeline_slo | default(true) }}"
+  dlo: "{{ swift_proxy_pipeline_dlo | default(true) }}"
+  versioned_writes: "{{ swift_proxy_pipeline_versioned_writes | default(true) }}"
+  ## Note: symlink must be after slo, dlo, versioned_writes, but before encryption in the pipeline.
+  symlink: "{{ swift_proxy_pipeline_symlink | default(true) }}"
+  keymaster: "{{ swift_proxy_pipeline_keymaster | default(false) }}"
+  encryption: "{{ swift_proxy_pipeline_encryption | default(false) }}"
+  proxy-logging: "{{ swift_proxy_pipeline_proxy_logging | default(true) }}"
+  proxy-server: "{{ swift_proxy_pipeline_proxy_server | default(true) }}"
+
+swift_proxy_server_conf:
+  DEFAULT:
+    #bind_ip: "{{ swift_outward_ip }}"
+    bind_ip: 0.0.0.0
+    bind_port: "{{ swift_proxy_port }}"
+    workers: "{{ swift_proxy_workers }}"
+    user: "{{ swift_user }}"
+  pipeline:
+    main:
+      pipeline: "{% for key,value in swift_proxy_pipeline.items() %}{{ key if (value |bool) is true }}{% if (value |bool) is true and not loop.last %} {% endif %}{% endfor %}"
+  app:
+    proxy-server:
+      use: egg:swift#proxy
+      allow_account_management: true
+      account_autocreate: true
+  filter:
+    tempauth:
+      "{{ swift_tempauth }}"
+    healthcheck:
+      use: egg:swift#healthcheck
+    cache:
+      use: egg:swift#memcache
+      memcache_servers: "{% for memcached in groups['swift_proxy'] %}{{ hostvars[memcached]['swift_cluster_ip'] }}:11211{% if not loop.last %},{% endif %}{% endfor %}"
+    ratelimit:
+      use: egg:swift#ratelimit
+    catch_errors:
+      use: egg:swift#catch_errors
+    tempurl:
+      use: egg:swift#tempurl
+    proxy-logging:
+      use: egg:swift#proxy_logging
+    bulk:
+      use: egg:swift#bulk
+    slo:
+      use: egg:swift#slo
+    dlo:
+      use: egg:swift#dlo
+    container-quotas:
+      use: egg:swift#container_quotas
+    account-quotas:
+      use: egg:swift#account_quotas
+    gatekeeper:
+      use: egg:swift#gatekeeper
+    container_sync:
+      use: egg:swift#container_sync
+    versioned_writes:
+      use: egg:swift#versioned_writes
+    copy:
+      use: egg:swift#copy
+      object_post_as_copy: false
+    keystoneauth:
+      use: egg:swift#keystoneauth
+      operator_roles: admin, SwiftOperator
+      cache: swift.cache

@@ -1,0 +1,5 @@
+PORT={{ swift_memcached_port | default(11211) }}
+USER={{ swift_memcached_user | default('memcached') }}
+MAXCONN={{ swift_memcached_maxconn | default(1024) }}
+CACHESIZE={{ swift_memcached_cachesize | default(64) }}
+OPTIONS="-l {{ swift_cluster_ip }}"

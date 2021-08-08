@@ -1,0 +1,52 @@
+---
+swift_object_rings:
+  - name: object
+    part_power: "{{ swift_object_rings_part_power | default(17) }}"
+    default: "{{ swift_object_rings_default | default(true) }}"
+    replicas: "{{ swift_object_rings_replicas | default(3) }}"
+    min_part_hours: "{{ swift_object_rings_min_part_hours | default(0) }}"
+    aliases: "{{ swift_object_rings_aliases | default('yellow') }}"
+    policy_type: "{{ swift_object_rings_policy_type | default('replication') }}"
+    diskfile_module: "{{ swift_object_rings_diskfile_module | default('egg:swift#replication.fs') }}"
+#  - name: 3-replica-ssd
+#    part_power: 16
+#    default: false
+#    replicas: 3
+#    min_part_hours: 0
+#    aliases: green
+#    policy_type: replication
+#    diskfile_module: egg:swift#replication.fs
+#  - name: ec-43
+#    part_power: 17
+#    min_part_hours: 0
+#    aliases: df4-3
+#    policy_type: erasure_coding
+#    diskfile_module: egg:swift#erasure_coding.fs
+#    ec_type: liberasurecode_rs_vand
+#    ec_num_data_fragments: 4
+#    ec_num_parity_fragments: 3
+#    ec_object_segment_size: 1048576
+#    replicas: 7
+#  - name: ec-84
+#    part_power: 17
+#    min_part_hours: 0
+#    aliases: df8-4
+#    policy_type: erasure_coding
+#    diskfile_module: egg:swift#erasure_coding.fs
+#    ec_type: liberasurecode_rs_vand
+#    ec_num_data_fragments: 8
+#    ec_num_parity_fragments: 4
+#    ec_object_segment_size: 1048576
+#    replicas: 12
+#  - name: ec-154
+#    aliases: df15-4
+#    default: false
+#    diskfile_module: egg:swift#erasure_coding.fs
+#    ec_num_data_fragments: 15
+#    ec_num_parity_fragments: 4
+#    ec_object_segment_size: 1048576
+#    ec_type: liberasurecode_rs_vand
+#    min_part_hours: 0
+#    part_power: 17
+#    policy_type: erasure_coding
+#    replicas: 19

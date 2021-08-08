@@ -1,0 +1,7 @@
+---
+# A different subnet is not required, you can use the same for all, if you prefer
+# Or have an outward subnet and then another subnet for both cluster and replication
+# These default networks are reserved private IPv4, see https://en.wikipedia.org/wiki/IPv4#Special-use_addresses
+swift_outward_subnet: 203.0.113.0/24
+swift_cluster_subnet: 192.0.2.0/24
+swift_replication_subnet: 198.51.100.0/24

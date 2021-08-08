@@ -1,0 +1,19 @@
+---
+swift_gid: 160
+swift_group: swift
+swift_uid: 160
+swift_user: swift
+
+swift_repos: []
+
+swift_deps: []
+
+swift_packages:
+  - openstack-swift-account
+  - openstack-swift-container
+  - openstack-swift-object
+  - openstack-swift-proxy
+  - python3-swiftclient
+  - rsync
+  - sqlite
+  - xfsprogs

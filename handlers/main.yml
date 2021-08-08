@@ -1,0 +1,88 @@
+---
+# handlers file for csmart.swift---
+- name: Restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+    enabled: yes
+  listen: "restart logging server"
+  become: true
+
+- name: Restart keepalived
+  service:
+    name: keepalived
+    state: restarted
+    enabled: yes
+  listen: "restart keepalived server"
+  become: true
+
+- name: Restart memcached
+  service:
+    name: memcached
+    state: restarted
+    enabled: yes
+  listen: "restart memcache server"
+  become: true
+
+- name: Restart rsyncd
+  service:
+    name: rsyncd
+    state: restarted
+    enabled: yes
+  listen: "restart rsync server"
+  become: true
+
+- name: Restart Swift proxy services
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  listen: "restart openstack swift proxy server"
+  become: true
+  with_items:
+    - openstack-swift-container-reconciler
+    - openstack-swift-object-expirer
+    - openstack-swift-proxy
+
+- name: Restart Swift object services
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  listen: "restart openstack swift object server"
+  become: true
+  with_items:
+    - openstack-swift-object
+    - openstack-swift-object-auditor
+    - openstack-swift-object-reconstructor
+    - openstack-swift-object-replicator
+    - openstack-swift-object-updater
+
+- name: Restart Swift container services
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  listen: "restart openstack swift container server"
+  become: true
+  with_items:
+    - openstack-swift-container
+    - openstack-swift-container-auditor
+    - openstack-swift-container-reconciler
+    - openstack-swift-container-replicator
+    - openstack-swift-container-sharder
+    - openstack-swift-container-sync
+    - openstack-swift-container-updater
+
+- name: Restart Swift account services
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  listen: "restart openstack swift account server"
+  become: true
+  with_items:
+    - openstack-swift-account
+    - openstack-swift-account-auditor
+    - openstack-swift-account-reaper
+    - openstack-swift-account-replicator

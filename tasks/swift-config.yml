@@ -1,0 +1,28 @@
+---
+- name: Set Swift hash suffix
+  ini_file:
+    path: /etc/swift/swift.conf
+    section: swift-hash
+    option: swift_hash_path_suffix
+    value: "{{ swift_hash_suffix }}"
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+  become: true
+  tags:
+    - config
+    - prep
+
+- name: Set Swift hash prefix
+  ini_file:
+    path: /etc/swift/swift.conf
+    section: swift-hash
+    option: swift_hash_path_prefix
+    value: "{{ swift_hash_prefix }}"
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+  become: true
+  tags:
+    - config
+    - prep

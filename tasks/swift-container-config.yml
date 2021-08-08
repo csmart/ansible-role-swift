@@ -1,0 +1,17 @@
+---
+- name: Configure Swift container service
+  template:
+    src: swift-container-server.conf.j2
+    dest: /etc/swift/container-server.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_container']"
+  notify: "restart openstack swift container server"
+  tags:
+    - config
+    - container
+    - services

@@ -1,0 +1,27 @@
+---
+- name: Install memcached
+  package:
+    name: memcached
+    state: present
+  become: true
+  register: result_swift_memcached_install
+  retries: 30
+  delay: 10
+  until: result_swift_memcached_install is succeeded
+  tags:
+    - prep
+    - memcached
+
+- name: Configure memcached
+  template:
+    src: memcached_memcached.j2
+    dest: /etc/sysconfig/memcached
+    owner: root
+    group: root
+    mode: 0644
+    backup: true
+  become: true
+  notify: "restart memcache server"
+  tags:
+    - prep
+    - memcached

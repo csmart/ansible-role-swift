@@ -1,0 +1,26 @@
+---
+# swift-configure
+- name: Swift rings
+  block:
+    - include_tasks: swift-config.yml
+    - include_tasks: swift-proxy-config.yml
+      tags:
+        - proxy
+    - include_tasks: swift-keepalived.yml
+      tags:
+        - keepalived
+    - include_tasks: swift-account-config.yml
+      tags:
+        - account
+    - include_tasks: swift-container-config.yml
+      tags:
+        - container
+    - include_tasks: swift-object-config.yml
+      tags:
+        - object
+    - include_tasks: swift-dispersion-config.yml
+      tags:
+        - dispersion
+  tags:
+    - config
+    - services

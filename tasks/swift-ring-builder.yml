@@ -1,0 +1,75 @@
+---
+- name: Swift ring tasks
+  block:
+    - name: Create account ring
+      command:
+        cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours |default(1) }}
+        creates: /etc/swift/{{ item.name }}.builder
+      loop: "{{ swift_account_rings }}"
+      delegate_to: swift-admin
+      become: true
+      become_user: "{{ swift_user }}"
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      ignore_errors: true
+
+    - name: Create container ring
+      command:
+        cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours }}
+        creates: /etc/swift/{{ item.name }}.builder
+      loop: "{{ swift_container_rings }}"
+      delegate_to: swift-admin
+      become: true
+      become_user: "{{ swift_user }}"
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      ignore_errors: true
+
+    - name: Create object rings
+      command:
+        cmd: swift-ring-builder /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours }}
+        creates: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder
+      loop: "{{ swift_object_rings }}"
+      loop_control:
+        index_var: loop_index
+      delegate_to: swift-admin
+      become: true
+      become_user: "{{ swift_user }}"
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      ignore_errors: true
+
+    ## TODO update to put devices in the right rings
+    - name: Add disks to rings
+      command:
+        cmd: |
+          swift-ring-builder
+          /etc/swift/{{ item.1.name }}.builder
+          add
+          --region {{ item.1.region |default(1) }}
+          --zone {{ item.1.zone |default(1) }}
+          --ip {{ swift_cluster_ip }}
+          {% if item.1.name == "account" %}
+          --port {{ item.1.port | default(swift_account_port) }}
+          {% elif item.1.name == "container" %}
+          --port {{ item.1.port | default(swift_container_port) }}
+          {% elif item.1.name == "object" %}
+          --port {{ item.1.port | default(swift_object_port) }}
+          {% endif %}
+          --device {{ item.0.disk.device }}
+          --weight {{ item.1.weight |default(0) }}
+          --meta {{ item.0.disk.device }}
+      with_subelements:
+        - "{{ swift_rings_disks }}"
+        - disk.rings
+      delegate_to: swift-admin
+      when:
+        - 'inventory_hostname != "swift-admin"'
+      become: true
+      become_user: "{{ swift_user }}"
+      ignore_errors: true
+      register: result_add_disks
+      throttle: 1
+      failed_when: "'FAILED123' in result_add_disks.stderr"
+  tags:
+    - rings

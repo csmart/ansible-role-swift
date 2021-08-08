@@ -1,0 +1,29 @@
+---
+#- name: Enable powertools repo
+#  community.general.ini_file:
+#    path: /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
+#    section: powertools
+#    option: enabled
+#    value: 1
+#    mode: 0644
+#    backup: yes
+#
+- name: Add required repositories
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    enabled: "{{ item.enabled | default(1) }}"
+    file: "{{ item.file }}"
+    state: present
+    mirrorlist: "{{ item.mirrorlist }}"
+    gpgcheck: "{{ item.gpgcheck }}"
+    gpgkey: "{{ item.gpgkey }}"
+  become: true
+  register: result_swift_repos_enable
+  retries: 30
+  delay: 10
+  until: result_swift_repos_enable is succeeded
+  loop: "{{ swift_common_repos }}"
+  tags:
+    - common
+    - packages

@@ -1,0 +1,36 @@
+---
+- name: Install dependencies for SELinux module
+  dnf:
+    name: python3-libselinux
+    state: present
+  register: dnf_selinux_result
+  retries: "{{ swift_retries | default('3') }}"
+  delay: "{{ swift_retries | default('5') }}"
+  until: dnf_selinux_result is succeeded
+  become: true
+  tags:
+    - common
+    - selinux
+
+- name: Write SELinux config
+  selinux:
+    policy: targeted
+    state: "{{ swift_selinux_state | default('permissive') }}"
+  become: true
+  tags:
+    - common
+    - selinux
+
+- name: SELinux booleans
+  seboolean:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('yes') }}"
+    persistent: "{{ item.persistent | default('yes') }}"
+  become: true
+  with_items:
+    - name: rsync_full_access
+      state: yes
+      persistent: yes
+  tags:
+    - common
+    - selinux

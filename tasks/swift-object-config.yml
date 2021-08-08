@@ -1,0 +1,34 @@
+---
+- name: Configure Swift object service
+  template:
+    src: swift-object-server.conf.j2
+    dest: /etc/swift/object-server.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_object']"
+  notify: "restart openstack swift object server"
+  tags:
+    - config
+    - object
+    - services
+
+- name: Configure Swift object expirer service
+  template:
+    src: swift-object-expirer.conf.j2
+    dest: /etc/swift/object-expirer.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_object']"
+  notify: "restart openstack swift proxy server"
+  tags:
+    - config
+    - object
+    - services
