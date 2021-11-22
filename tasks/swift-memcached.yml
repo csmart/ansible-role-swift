@@ -25,3 +25,19 @@
   tags:
     - prep
     - memcached
+
+- name: Configure Swift memcache settings
+  template:
+    src: swift-memcache.conf.j2
+    dest: /etc/swift/memcache.conf
+    mode: 0640
+    owner: "{{ swift_user }}"
+    group: "{{ swift_group }}"
+    backup: true
+  become: true
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+  notify: "restart openstack swift proxy server"
+  tags:
+    - prep
+    - memcached
