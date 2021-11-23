@@ -1,6 +1,6 @@
 ---
 swift_dispersion_conf:
   dispersion:
-    auth_url: http://192.0.2.111:8080/auth/v1.0
+    auth_url: https://203.0.113.111/auth/v1.0
     auth_user: test:tester
     auth_key: testing

@@ -52,6 +52,16 @@
   tags:
     - prep
 
+# swift-ssl
+- name: Swift SSL proxy
+  block:
+    - include_tasks: swift-ssl.yml
+    - include_tasks: swift-hitch.yml
+  tags:
+    - config
+    - prep
+    - ssl
+
 # swift-rings
 - name: Swift rings
   block:

@@ -1,0 +1,37 @@
+# Run 'man hitch.conf' for a description of all options.
+frontend = "[{{ swift_hitch_conf['frontend'].host | default('*') }}]:{{ swift_hitch_conf['frontend'].port | default(443) }}"
+backend = "[{{ swift_proxy_server_conf['DEFAULT'].bind_ip }}]:{{ swift_proxy_server_conf.DEFAULT.bind_port }}"
+workers = {{ ansible_processor_vcpus }}
+
+daemon = on
+
+# We strongly recommend you create a separate non-privileged hitch
+# user and group
+user = {{ swift_hitch_conf.user | default('hitch') }}
+group = {{ swift_hitch_conf.group | default('hitch') }}
+
+# run Varnish as backend over PROXY; varnishd -a :80 -a localhost:6086,PROXY ..
+write-proxy-v1 = on
+
+# Enable to let clients negotiate HTTP/2 with ALPN. (default off)
+# alpn-protos = "h2, http/1.1"
+
+backlog = {{ swift_hitch_conf.backlog | default(1024) }}
+
+{% if swift_hitch_conf.ciphers is defined and swift_hitch_conf.ciphers %}
+ciphers = "{{ swift_hitch_conf.ciphers }}"
+{% endif %}
+
+pem-file = {
+    cert = "/etc/pki/tls/certs/swift.pem"
+    private-key = "/etc/pki/tls/private/swift.key"
+}
+
+tls-protos = {{ swift_hitch_conf['tls-protos'] | default('TLSv1.2')}}
+
+prefer-server-ciphers = on
+
+keepalive = {{ swift_hitch_conf.keepalive | default(60) }}
+
+syslog = on
+log-level = 1

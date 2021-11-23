@@ -1,5 +1,4 @@
 [DEFAULT]
-## TODO: this will change to localhost once proxy is enabled
 bind_ip = {{ swift_proxy_server_conf.DEFAULT.bind_ip | default(swift_cluster_ip) }}
 bind_port = {{ swift_proxy_server_conf.DEFAULT.bind_port | default(6202) }}
 keep_idle = {{ swift_proxy_server_conf.DEFAULT.keep_idle | default(600) }}
@@ -311,7 +310,7 @@ write_affinity_handoff_delete_count = {{ swift_proxy_server_conf.app['proxy-serv
 # These are the headers whose values will only be shown to swift_owners. The
 # exact definition of a swift_owner is up to the auth system in use, but
 # usually indicates administrative responsibilities.
-{% if swift_proxy_server_conf.app['proxy-server'].require_proxy_protocol is defined and swift_proxy_server_conf.app['proxy-server'].require_proxy_protocol %}
+{% if swift_proxy_server_conf.app['proxy-server'].swift_owner_headers is defined and swift_proxy_server_conf.app['proxy-server'].swift_owner_headers %}
 #swift_owner_headers = x-container-read, x-container-write, x-container-sync-key, x-container-sync-to, x-account-meta-temp-url-key, x-account-meta-temp-url-key-2, x-container-meta-temp-url-key, x-container-meta-temp-url-key-2, x-account-access-control
 swift_owner_headers = {{ swift_proxy_server_conf.app['proxy-server'].swift_owner_headers }}
 {% endif %}

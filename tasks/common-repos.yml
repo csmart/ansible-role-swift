@@ -27,3 +27,16 @@
   tags:
     - common
     - packages
+
+- name: Enable EPEL repo
+  package:
+    name: epel-release
+    state: present
+  become: true
+  register: result_epel_install
+  retries: 30
+  delay: 10
+  until: result_epel_install is succeeded
+  tags:
+    - common
+    - packages

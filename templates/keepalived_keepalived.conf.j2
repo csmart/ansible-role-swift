@@ -9,7 +9,8 @@ global_defs {
 }
 
 vrrp_script chk_proxy {
-  script "/bin/bash -c 'set -e ; curl -I -skg -m 10 --connect-timeout 2 http://{{ swift_outward_subnet | next_nth_usable(server_ip) }}:8080/healthcheck'"
+  script "/bin/bash -c 'set -e ; curl -I -skg -m 10 --connect-timeout 2 https://127.0.0.1/healthcheck'"
+
   interval 5
   timeout 11
   fail 2

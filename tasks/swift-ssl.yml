@@ -1,0 +1,32 @@
+---
+- name: Copy SSL cert in place
+  copy:
+    content: "{{ swift_ssl_cert }}"
+    dest: /etc/pki/tls/certs/swift.pem
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  tags:
+    - ssl
+    - prep
+    - hitch
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+  notify: "restart hitch server"
+
+- name: Copy SSL key in place
+  copy:
+    content: "{{ swift_ssl_key }}"
+    dest: /etc/pki/tls/private/swift.key
+    owner: root
+    group: root
+    mode: '0600'
+  become: true
+  tags:
+    - ssl
+    - prep
+    - hitch
+  when:
+    - "inventory_hostname in groups['swift_proxy']"
+  notify: "restart hitch server"

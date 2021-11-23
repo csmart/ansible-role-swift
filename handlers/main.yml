@@ -32,6 +32,14 @@
   listen: "restart rsync server"
   become: true
 
+- name: Restart hitch
+  service:
+    name: hitch
+    state: restarted
+    enabled: yes
+  listen: "restart hitch server"
+  become: true
+
 - name: Restart Swift proxy services
   service:
     name: "{{ item }}"
