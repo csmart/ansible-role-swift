@@ -1,0 +1,165 @@
+---
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+  vars:
+    swift_rings:
+      - type: account
+        part_power: 10
+        replicas: 3
+        path: /home/csmart/code/ansible-role-swift/library/test
+      - type: container
+        part_power: 10
+        replicas: 3
+        path: /home/csmart/code/ansible-role-swift/library/test
+      - type: object
+        #ring builder vars
+        policy_id: 0
+        path: /home/csmart/code/ansible-role-swift/library/test
+        part_power: 17
+        replicas: 3
+        backup: false
+        create: true
+        # swift.conf vars
+        aliases:
+          - replicas-3
+          - gold
+        policy_type: replication
+        diskfile_module: egg:swift#replication.fs
+      - type: object
+        # ring builder vars
+        policy_id: 1
+        path: /home/csmart/code/ansible-role-swift/library/test
+        part_power: 17
+        replicas: 7
+        backup: false
+        create: true
+        # swift.conf vars
+        aliases:
+          - ec-43
+          - silver
+        policy_type: erasure_coding
+        ec_type: liberasurecode_rs_vand
+        ec_num_data_fragments: 4
+        ec_num_parity_fragments: 3
+        ec_object_segment_size: 1048576
+        diskfile_module: egg:swift#erasure_coding.fs
+
+    #  - id
+    #  - weight
+    #  - region
+    #  - zone
+    #  - ip
+    #  - port
+    #  - replication_ip ?
+    #  - replication_port?
+    #  - device
+    #  - meta
+
+    swift_devs:
+      - device: sdb
+        id: 1
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        meta: meta
+        rings:
+        - type: account
+          weight: 0
+          part_power: 10
+        - type: container
+          part_power: 10
+          weight: 0
+        - type: object
+          weight: 100
+        - type: object
+          policy_id: 1
+          weight: 100
+      - device: sdb
+        id: 2
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+        - type: account
+          weight: 0
+          part_power: 10
+        - type: container
+          part_power: 10
+          weight: 0
+        - type: object
+          weight: 100
+        - type: object
+          policy_id: 1
+          weight: 100
+      - device: sdc
+        id: 3
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+        - type: account
+          weight: 0
+          part_power: 10
+        - type: container
+          part_power: 10
+          weight: 0
+        - type: object
+          weight: 100
+        - type: object
+          policy_id: 1
+          weight: 100
+      - device: nvme0n1
+        id: 4
+        port: 8080
+        ip: 127.0.0.1
+        meta: meta
+        rings:
+        - type: account
+          weight: 100
+          part_power: 10
+        - type: container
+          weight: 100
+          part_power: 10
+        - type: object
+          weight: 0
+        - type: object
+          policy_id: 1
+          weight: 0
+      - device: nvme0n2
+        id: 5
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+        - type: account
+          weight: 100
+          part_power: 10
+        - type: container
+          weight: 100
+          part_power: 10
+        - type: object
+          weight: 0
+        - type: object
+          policy_id: 1
+          weight: 0
+      - device: nvme0n3
+        id: 6
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+        - type: account
+          weight: 100
+          part_power: 10
+        - type: container
+          weight: 100
+          part_power: 10
+        - type: object
+          weight: 0
+        - type: object
+          policy_id: 1
+          weight: 0
+

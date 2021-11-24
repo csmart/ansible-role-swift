@@ -1,0 +1,97 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create rings
+    swift_ring:
+      type: "{{ item['type'] }}"
+      rebalance: false
+      validate: false
+      path: "{{ item['path'] }}"
+      part_power: "{{ item['part_power'] }}"
+      replicas: "{{ item['replicas'] }}"
+      backup: "{{ item['backup'] | default(false) }}"
+      create: "{{ item['create'] | default(true) }}"
+      id: "{{ item['policy_id'] | default(0) }}"
+    register: result_rings
+    loop: "{{ swift_rings }}"
+
+  - name: Print result
+    debug:
+      msg: '{{ result_rings }}'
+
+  - name: Add hard-coded devices to account and container rings
+    swift_ring:
+      type: "{{ item }}"
+      id: 0
+      rebalance: false
+      validate: false
+      path: '/home/csmart/code/ansible-role-swift/library/test'
+      part_power: 10
+      replicas: 3
+      backup: false
+      create: true
+      devices:
+        - id: 0
+          weight: 100
+          region: 1
+          zone: 1
+          ip: "127.0.0.1"
+          port: 8080
+          device: sdb
+          meta: meta
+    register: result_rings
+    loop:
+      - account
+      - container
+
+  - name: Add hard-coded devices to object rings
+    swift_ring:
+      type: object
+      id: "{{ item }}"
+      rebalance: false
+      validate: false
+      path: '/home/csmart/code/ansible-role-swift/library/test'
+      part_power: 17
+      replicas: 3
+      backup: false
+      create: true
+      devices:
+        - id: 0
+          weight: 100
+          region: 1
+          zone: 1
+          ip: "127.0.0.1"
+          port: 8080
+          device: sdb
+          meta: meta
+    register: result_rings
+    loop:
+      - 0
+      - 1
+
+  - name: Add inventory devices to rings
+    swift_ring:
+      type: "{{ item.1.type }}"
+      id: "{{ item.1.policy_id | default(0) }}"
+      rebalance: false
+      validate: false
+      path: /home/csmart/code/ansible-role-swift/library/test
+      part_power: "{{ item.1.part_power | default(17) }}"
+      replicas: 3
+      backup: false
+      create: true
+      devices:
+        - id: "{{ item.0.id | int }}"
+          weight: "{{ item.1.weight | default(0) }}"
+          region: "{{ item.0.region | default(1) }}"
+          zone: "{{ item.0.zone | default(1) }}"
+          ip: "{{ item.0.ip }}"
+          port: "{{ item.0.port }}"
+          device: "{{ item.0.device }}"
+          meta: "{{ item.0.meta | default('') }}"
+    register: result_rings
+    with_subelements:
+      - "{{ swift_devs }}"
+      - rings
+
+  # TODO validate and rebalance rings

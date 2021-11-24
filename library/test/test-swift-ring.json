@@ -1,0 +1,44 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+    "backup": false,
+    "create": true,
+    "min_part_hours": "0",
+    "type": "object",
+    "id": 0,
+    "part_power": "17",
+    "path": "test",
+    "replicas": "3",
+    "devices": [
+      {
+        "id": "0",
+        "weight": "100",
+        "region": "1",
+        "zone": "1",
+        "ip": "127.0.0.1",
+        "port": "8080",
+        "device": "sdb",
+        "meta": "meta"
+      },
+      {
+        "id": "1",
+        "weight": "100",
+        "region": "1",
+        "zone": "1",
+        "ip": "127.0.0.1",
+        "port": "8080",
+        "device": "sdb",
+        "meta": "meta"
+      },
+      {
+        "id": "2",
+        "weight": "100",
+        "region": "1",
+        "zone": "1",
+        "ip": "127.0.0.1",
+        "port": "8080",
+        "device": "sdb",
+        "meta": "meta"
+      }
+    ]
+  }
+}
