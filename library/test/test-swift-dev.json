@@ -1,0 +1,43 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+    "backup": false,
+    "create": true,
+    "min_part_hours": "1",
+    "name": "object",
+    "part_power": "17",
+    "path": ".",
+    "replicas": "3",
+    "disk": [
+      {
+        "id": 1,
+        "region": 1,
+        "zone": 1,
+        "ip": "127.0.0.1",
+        "port": 8080,
+        "device": "sdx",
+        "meta": "",
+        "weight": 100
+      },
+      {
+        "id": 2,
+        "region": 1,
+        "zone": 1,
+        "ip": "127.0.0.1",
+        "port": 8080,
+        "device": "sdy",
+        "meta": "",
+        "weight": 100
+      },
+      {
+        "id": 3,
+        "region": 1,
+        "zone": 1,
+        "ip": "127.0.0.1",
+        "port": 8080,
+        "device": "sdz",
+        "meta": "",
+        "weight": 100
+      }
+    ]
+  }
+}
