@@ -1,0 +1,43 @@
+---
+- name: Test creating a Swift ring
+  hosts: localhost
+  vars:
+    swift_disks:
+      - id: 1
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        device: sdx
+        meta: ''
+        weight: 100
+      - id: 2
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        device: sdz
+        meta: ''
+        weight: 100
+      - id: 3
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        device: sdz
+        meta: ''
+        weight: 100
+  tasks:
+  - name: Create object ring
+    swift_ring:
+      name: object
+      path: /home/csmart/code/ansible-role-swift/library
+      part_power: 17
+      replicas: 3
+      backup: false
+      create: true
+      disk: "{{ swift_disks }}"
+    register: testout
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'

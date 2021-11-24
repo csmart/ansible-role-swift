@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create rings
+    swift_ring:
+      name: "{{ item.key }}"
+      backup: false
+      create: true
+      min_part_hours: "{{ item.value['min_part_hours'] | default(0) }}"
+      part_power: "{{ item.value['part_power'] }}"
+      path: "{{ item.value['path'] }}"
+      rebalance: false
+      replicas: "{{ item.value['replicas'] }}"
+      validate: false
+    register: result_rings
+    with_dict: "{{ swift_rings }}"
+
+  - name: Print result
+    debug:
+      msg: '{{ result_rings }}'
+
+  - name: Full ring at once
+    swift_ring:
+      name: "{{ item.key }}"
+      devices: "{{ swift_devices }}"
+      path: "{{ item.value['path'] }}"
+      rebalance: true
+      validate: true
+    with_dict: "{{ swift_rings }}"
+    register: result_rings
+
+  - name: Print result
+    debug:
+      msg: '{{ result_rings }}'
