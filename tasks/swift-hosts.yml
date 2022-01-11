@@ -1,6 +1,18 @@
 ---
 - name: Prepare Swift hosts
   block:
+    - name: Ensure root .ssh dir exists
+      file:
+        path: /root/.ssh
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+      when:
+        - 'inventory_hostname == "swift-admin"'
+      register: res_swift_sshdir
+      become: true
+
     - name: Generate SSH admin key
       openssh_keypair:
         path: /root/.ssh/id_rsa
