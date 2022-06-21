@@ -30,3 +30,27 @@
   when:
     - "inventory_hostname in groups['swift_proxy']"
   notify: "restart hitch server"
+
+- name: Copy SSL CA cert
+  copy:
+    content: "{{ swift_ssl_cacert }}"
+    dest: /etc/pki/ca-trust/source/anchors/swift-cacert.pem
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  tags:
+    - ssl
+    - prep
+    - hitch
+  when:
+    - swift_ssl_cacert is defined and swift_ssl_cacert
+
+- name: Trust SSL CA cert
+  command:
+    cmd: update-ca-trust
+  tags:
+    - ssl
+    - prep
+    - hitch
+  become: true
