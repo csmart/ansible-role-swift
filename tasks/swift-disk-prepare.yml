@@ -53,7 +53,7 @@
         fstype: xfs
         force: false
         dev: "/dev/{{ item.split()[1] }}"
-        opts: "-d sunit=512,swidth=512 -L '{{ item.split()[1] }}'"
+        opts: "-d sunit=512,swidth=512 -L {{ item.split()[1] }}"
       become: true
       with_items: "{{ swift_disks_list }}"
       when:
