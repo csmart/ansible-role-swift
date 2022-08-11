@@ -6,11 +6,11 @@
         cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours |default(1) }}
         creates: /etc/swift/{{ item.name }}.builder
       loop: "{{ swift_account_rings }}"
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       ignore_errors: true
 
     - name: Create container ring
@@ -18,11 +18,11 @@
         cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours }}
         creates: /etc/swift/{{ item.name }}.builder
       loop: "{{ swift_container_rings }}"
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       ignore_errors: true
 
     - name: Create object rings
@@ -32,11 +32,11 @@
       loop: "{{ swift_object_rings }}"
       loop_control:
         index_var: loop_index
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       ignore_errors: true
 
     ## TODO update to put devices in the right rings
@@ -62,9 +62,9 @@
       with_subelements:
         - "{{ swift_rings_disks }}"
         - disk.rings
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       when:
-        - 'inventory_hostname != "swift-admin"'
+        - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
       become: true
       become_user: "{{ swift_user }}"
       ignore_errors: true

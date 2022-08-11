@@ -9,7 +9,7 @@
         group: root
         mode: 0700
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       register: res_swift_sshdir
       become: true
 
@@ -20,7 +20,7 @@
         size: 2048
         state: present
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       register: res_swift_sshkeygen
       become: true
 
@@ -28,7 +28,7 @@
       set_fact:
         swift_admin_ssh_public_key: "{{ res_swift_sshkeygen.public_key }}"
       when:
-        - 'inventory_hostname == "swift-admin"'
+        - "inventory_hostname == groups['swift_admin'][0]"
       run_once: true
 
     - name: Copy SSH admin public key to nodes
@@ -44,13 +44,13 @@
         host: "{{ swift_cluster_ip }}"
         search_regex: OpenSSH
         timeout: 600
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
 
     - name: Get node SSH fingerprints
       shell: "set -o pipefail && ssh-keyscan {{ inventory_hostname }} {{ swift_cluster_ip }} | sort"
       args:
         executable: /bin/bash
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       register: result_keyscan
       changed_when: false
 
@@ -65,7 +65,7 @@
           {{ hostvars[item]['result_keyscan']['stdout'] }}
       become: true
       changed_when: false
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       with_items: "{{ play_hosts }}"
       run_once: true
 
@@ -77,7 +77,7 @@
         block: |-
           {{ hostvars[item]['swift_cluster_ip'] }} {{ hostvars[item]['inventory_hostname'] }}
       become: true
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       with_items: "{{ play_hosts }}"
       run_once: true
 
@@ -93,7 +93,7 @@
             Hostname  {{ hostvars[item]['swift_cluster_ip'] }}
             IdentityFile /root/.ssh/id_rsa
       become: true
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       with_items: "{{ play_hosts }}"
       run_once: true
   tags:

@@ -26,6 +26,7 @@ Requirements
 
 An inventory of pre-existing CentOS 8 Stream nodes with their networking configured.
 The cluster requires an admin box (included in `swift_admin` group) from which all the Swift nodes are managed.
+This can be one of your Swift nodes, if you don't have a separate admin host.
 
 If building a virtual Swift cluster, consider using `csmart.virt_infra` Ansible role at https://github.com/csmart/ansible-role-virt-infra.
 
