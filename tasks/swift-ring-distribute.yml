@@ -6,10 +6,11 @@
         src: /etc/swift/{{ item.name }}.ring.gz
         dest: /etc/swift/{{ item.name }}.ring.gz
       loop: "{{ swift_account_rings }}"
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       when:
-        - 'inventory_hostname != "swift-admin"'
+        - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
+
       notify:
         - "restart openstack swift proxy server"
         - "restart openstack swift account server"
@@ -19,10 +20,10 @@
         src: /etc/swift/{{ item.name }}.ring.gz
         dest: /etc/swift/{{ item.name }}.ring.gz
       loop: "{{ swift_container_rings }}"
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       when:
-        - 'inventory_hostname != "swift-admin"'
+        - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
       notify:
         - "restart openstack swift proxy server"
         - "restart openstack swift container server"
@@ -34,10 +35,10 @@
       loop: "{{ swift_object_rings }}"
       loop_control:
         index_var: loop_index
-      delegate_to: swift-admin
+      delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       when:
-        - 'inventory_hostname != "swift-admin"'
+        - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
       notify:
         - "restart openstack swift proxy server"
         - "restart openstack swift object server"
