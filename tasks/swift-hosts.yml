@@ -26,9 +26,7 @@
 
     - name: Set the public key
       set_fact:
-        swift_admin_ssh_public_key: "{{ res_swift_sshkeygen.public_key }}"
-      when:
-        - "inventory_hostname == groups['swift_admin'][0]"
+        swift_admin_ssh_public_key: "{{ hostvars[groups['swift_admin'][0]].res_swift_sshkeygen.public_key }}"
       run_once: true
 
     - name: Copy SSH admin public key to nodes
