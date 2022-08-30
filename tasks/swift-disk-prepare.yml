@@ -3,7 +3,7 @@
   block:
     - name: Match disk on node to Swift ID
       shell:
-        cmd: swift-ring-builder /etc/swift/{{ item }}.builder search --region 1 --zone 1 --ip {{ swift_cluster_ip }} |grep -v Devices | awk '{print $1,$8}'
+        cmd: swift-ring-builder /etc/swift/{{ item }}.builder search --region 1 --zone 1 --ip {{ swift_cluster_ip }} |grep -v Devices | awk '{print $1,$8,$NF}'
       delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
@@ -52,8 +52,8 @@
       filesystem:
         fstype: xfs
         force: false
-        dev: "/dev/{{ item.split()[1] }}"
-        opts: "-d sunit=512,swidth=512 -L {{ item.split()[1] }}"
+        dev: "{{ item.split()[2] }}"
+        opts: "-d sunit=512,swidth=512 -L {{ item.split()[1][:12] }}"
       become: true
       with_items: "{{ swift_disks_list }}"
       when:
@@ -63,7 +63,7 @@
     - name: Mount the drives
       mount:
         path: "/srv/node/{{ item.split()[1] }}"
-        src: "LABEL={{ item.split()[1] }}"
+        src: "LABEL={{ item.split()[1][:12] }}"
         fstype: xfs
         state: mounted
         opts: "rw,noatime,nodiratime,seclabel,attr2,inode64,logbufs=8,sunit=512,swidth=512,noquota"
