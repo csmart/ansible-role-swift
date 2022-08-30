@@ -15,7 +15,7 @@
 - name: Write SELinux config
   selinux:
     policy: targeted
-    state: "{{ swift_selinux_state | default('permissive') }}"
+    state: "{{ swift_selinux_state }}"
   become: true
   tags:
     - common
@@ -31,6 +31,7 @@
     - name: rsync_full_access
       state: yes
       persistent: yes
+  when: "swift_selinux_state != 'disabled'"
   tags:
     - common
     - selinux
