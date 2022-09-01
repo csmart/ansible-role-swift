@@ -37,6 +37,11 @@
     - include_tasks: swift-packages.yml
       tags:
         - packages
+    - include_tasks: common-firewall.yml
+      when:
+        - swift_firewall is defined and (swift_firewall | bool == true)
+      tags:
+        - firewall
     - include_tasks: common-logging.yml
       tags:
         - logging

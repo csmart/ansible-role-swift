@@ -1,0 +1,43 @@
+---
+- name: Install firewall packages
+  dnf:
+    name: firewalld, python3-firewall
+    state: installed
+  register: result_firewall_install
+  retries: "{{ swift_retries }}"
+  delay: "{{ swift_delay }}"
+  until: result_firewall_install is succeeded
+  become: true
+  tags:
+    - prep
+    - firewall
+
+- name: Ensure firewall service running
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  become: true
+  tags:
+    - prep
+    - firewall
+
+- name: Add ports to firewall zone
+  firewalld:
+    port: "{{ item }}/tcp"
+    zone: "{{ swift_firewall_zone }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - "{{ swift_account_port }}"
+    - "{{ swift_container_port}}"
+    - "{{ swift_hitch_port | default(443) }}"
+    - "{{ swift_memcached_port | default(11211) }}"
+    - "{{ swift_object_port}}"
+    - "{{ swift_proxy_port}}"
+    - "{{ swift_rsync_port | default(873) }}"
+  become: true
+  tags:
+    - prep
+    - firewall

@@ -1,0 +1,3 @@
+---
+swift_firewall: true
+swift_firewall_zone: public
