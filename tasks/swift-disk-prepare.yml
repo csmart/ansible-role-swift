@@ -53,7 +53,7 @@
         fstype: xfs
         force: false
         dev: "{{ item.split()[2] }}"
-        opts: "-d sunit=512,swidth=512 -L {{ item.split()[1][:12] }}"
+        opts: "-d sunit=512,swidth=512 -L {{ item.split()[1][-12:] }}"
       become: true
       with_items: "{{ swift_disks_list }}"
       when:
@@ -63,7 +63,7 @@
     - name: Mount the drives
       mount:
         path: "/srv/node/{{ item.split()[1] }}"
-        src: "LABEL={{ item.split()[1][:12] }}"
+        src: "LABEL={{ item.split()[1][-12:] }}"
         fstype: xfs
         state: mounted
         opts: "rw,noatime,nodiratime,seclabel,attr2,inode64,logbufs=8,sunit=512,swidth=512,noquota"
