@@ -15,3 +15,5 @@
     - config
     - container
     - services
+
+- meta: flush_handlers

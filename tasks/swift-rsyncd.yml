@@ -27,3 +27,5 @@
   tags:
     - prep
     - rsyncd
+
+- meta: flush_handlers

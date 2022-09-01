@@ -49,6 +49,7 @@
 - name: Trust SSL CA cert
   command:
     cmd: update-ca-trust
+  changed_when: false
   tags:
     - ssl
     - prep
