@@ -27,3 +27,5 @@
   tags:
     - keepalived
     - services
+
+- meta: flush_handlers

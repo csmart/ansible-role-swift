@@ -15,3 +15,5 @@
     - config
     - proxy
     - services
+
+- meta: flush_handlers

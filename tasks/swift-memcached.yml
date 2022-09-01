@@ -41,3 +41,5 @@
   tags:
     - prep
     - memcached
+
+- meta: flush_handlers

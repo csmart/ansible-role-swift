@@ -11,10 +11,6 @@
       when:
         - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
 
-      notify:
-        - "restart openstack swift proxy server"
-        - "restart openstack swift account server"
-
     - name: Push container ring to cluster
       synchronize:
         src: /etc/swift/{{ item.name }}.ring.gz
@@ -24,9 +20,6 @@
       become: true
       when:
         - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
-      notify:
-        - "restart openstack swift proxy server"
-        - "restart openstack swift container server"
 
     - name: Push object rings to cluster
       synchronize:
@@ -39,8 +32,5 @@
       become: true
       when:
         - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
-      notify:
-        - "restart openstack swift proxy server"
-        - "restart openstack swift object server"
   tags:
     - rings

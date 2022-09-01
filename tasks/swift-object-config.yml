@@ -32,3 +32,5 @@
     - config
     - object
     - services
+
+- meta: flush_handlers

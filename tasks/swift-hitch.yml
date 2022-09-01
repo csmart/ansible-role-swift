@@ -46,3 +46,5 @@
     - hitch
   when:
     - "inventory_hostname in groups['swift_proxy']"
+
+- meta: flush_handlers
