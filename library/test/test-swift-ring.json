@@ -1,0 +1,71 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+    "backup": false,
+    "create": true,
+    "rebalance": true,
+    "validate": true,
+    "name": "object-3",
+    "part_power": "17",
+    "min_part_hours": 0,
+    "path": "test",
+    "replicas": "1",
+    "devices": {
+      "0": {
+        "device": "/dev/sdb",
+        "region": 1,
+        "zone": 1,
+        "rings": {
+          "object-3": {
+        "meta": "chickachow",
+        "port": 8888,
+        "ip": "127.127.127.1",
+            "weight": 99
+          }
+        }
+      },
+      "1": {
+        "device": "/dev/sdb",
+        "region": 1,
+        "zone": 1,
+        "port": 8080,
+        "ip": "127.0.0.2",
+        "meta": "meta",
+        "rings": {
+          "object-3": {
+            "weight": 99
+          }
+        }
+      },
+      "2": {
+        "device": "/dev/sdb",
+        "region": 1,
+        "zone": 1,
+        "port": 8080,
+        "ip": "127.0.0.3",
+        "meta": "meta",
+        "rings": {
+          "object-3": {
+            "weight": 99
+          }
+        }
+      },
+      "3": {
+        "note": "this will not get added as object-3 not in rings dict",
+        "device": "/dev/sdc",
+        "region": 1,
+        "zone": 1,
+        "ip": "127.0.0.1",
+        "port": 8080,
+        "meta": "meta",
+        "rings": {
+          "object": {
+            "weight": 100
+          },
+          "object-1": {
+            "weight": 100
+          }
+        }
+      }
+    }
+  }
+}

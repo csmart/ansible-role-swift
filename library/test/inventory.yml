@@ -1,0 +1,203 @@
+---
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+  vars:
+    swift_rings:
+      account:
+        part_power: 10
+        replicas: 3
+        region: 1
+        zone: 1
+        min_part_hours: 0
+        path: /home/csmart/code/ansible-role-swift/library/test
+      container:
+        part_power: 10
+        replicas: 3
+        region: 1
+        zone: 1
+        min_part_hours: 0
+        path: /home/csmart/code/ansible-role-swift/library/test
+      object:
+        part_power: 17
+        replicas: 3
+        region: 1
+        zone: 1
+        min_part_hours: 0
+        default: true
+        deprecated: false
+        backup: false
+        aliases:
+          - replicas-3
+          - gold
+        policy_name: bob
+        policy_type: replication
+        diskfile_module: egg:swift#replication.fs
+        path: /home/csmart/code/ansible-role-swift/library/test
+      object-1:
+        part_power: 17
+        replicas: 7
+        region: 1
+        zone: 1
+        min_part_hours: 0
+        backup: false
+        create: true
+        aliases:
+          - ec-43
+          - silver
+        policy_type: erasure_coding
+        ec_type: liberasurecode_rs_vand
+        ec_num_data_fragments: 4
+        ec_num_parity_fragments: 3
+        ec_object_segment_size: 1048576
+        ec_duplication_factor: 1
+        diskfile_module: egg:swift#erasure_coding.fs
+        path: /home/csmart/code/ansible-role-swift/library/test
+
+    ## New data structure with dict of dicts
+    swift_devices:
+      0:
+        device: /dev/nvme0n1
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.1
+        meta: meta
+        rings:
+          account:
+            weight: 100
+          container:
+            weight: 100
+      1:
+        device: /dev/nvme0n1
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+          account:
+            weight: 100
+          container:
+            weight: 100
+      2:
+        device: /dev/nvme0n1
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+          account:
+            weight: 100
+          container:
+            weight: 100
+      3:
+        device: /dev/sdb
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      4:
+        device: /dev/sdb
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      5:
+        device: /dev/sdb
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      6:
+        device: /dev/sdc
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      7:
+        device: /dev/sdc
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      8:
+        device: /dev/sdc
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      9:
+        device: /dev/sdd
+        region: 1
+        zone: 1
+        ip: 127.0.0.1
+        port: 8080
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      10:
+        device: /dev/sdd
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.2
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100
+      11:
+        device: /dev/sdd
+        region: 1
+        zone: 1
+        port: 8080
+        ip: 127.0.0.3
+        meta: meta
+        rings:
+          object:
+            weight: 100
+          object-1:
+            weight: 100

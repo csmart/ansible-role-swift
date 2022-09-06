@@ -1,0 +1,61 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create account ring
+    swift_ring:
+      type: account
+      path: /home/csmart/code/ansible-role-swift/library/test
+      part_power: 10
+      replicas: 3
+      backup: true
+      create: true
+    register: result_ring_account
+
+  - name: Print replacas result
+    debug:
+      msg: '{{ result_ring_account }}'
+
+  - name: Create container ring
+    swift_ring:
+      type: container
+      path: /home/csmart/code/ansible-role-swift/library/test
+      part_power: 10
+      replicas: 3
+      backup: false
+      create: true
+    register: result_ring_container
+
+  - name: Print replacas result
+    debug:
+      msg: '{{ result_ring_container }}'
+
+  - name: Create replicated object ring
+    swift_ring:
+      type: object
+      id: 0
+      path: /home/csmart/code/ansible-role-swift/library/test
+      part_power: 17
+      replicas: 3
+      backup: false
+      create: true
+      min_part_hours: 0
+    register: result_ring_replicas
+
+  - name: Print replacas result
+    debug:
+      msg: '{{ result_ring_replicas }}'
+
+  - name: Create erasure coded object ring
+    swift_ring:
+      type: object
+      id: 1
+      path: /home/csmart/code/ansible-role-swift/library/test
+      part_power: 17
+      replicas: 7
+      backup: false
+      create: true
+    register: result_ring_ec
+
+  - name: Print ec result
+    debug:
+      msg: '{{ result_ring_ec }}'
