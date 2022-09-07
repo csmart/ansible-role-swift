@@ -1,0 +1,6 @@
+---
+swift_rings_backup: true
+swift_rings_create: true
+swift_rings_path: /etc/swift
+swift_rings_rebalance: true
+swift_rings_validate: true

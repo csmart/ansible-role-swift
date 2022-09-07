@@ -1,75 +1,64 @@
 ---
 - name: Swift ring tasks
   block:
-    - name: Create account ring
-      command:
-        cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours |default(1) }}
-        creates: /etc/swift/{{ item.name }}.builder
-      loop: "{{ swift_account_rings }}"
+    - name: Manage account rings
+      swift_ring:
+        name: "{{ item.key }}"
+        backup: "{{ item.value['backup'] | default(swift_rings_backup) }}"
+        create: "{{ item.value['creates'] | default(swift_rings_create) }}"
+        devices: "{{ swift_devices }}"
+        min_part_hours: "{{ item.value['min_part_hours'] | default(swift_account_rings_min_part_hours) }}"
+        part_power: "{{ item.value['part_power'] | default(swift_account_rings_part_power) }}"
+        path: "{{ item.value['path'] | default(swift_rings_path) }}"
+        rebalance: "{{ item.value['rebalance'] | default(swift_rings_rebalance) }}"
+        replicas: "{{ item.value['replicas'] | default(swift_account_rings_replicas) }}"
+        validate: "{{ item.value['validate'] | default(swift_rings_validate) }}"
+      register: swift_result_account_rings
+      with_dict: "{{ swift_account_rings }}"
       delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
         - "inventory_hostname == groups['swift_admin'][0]"
-      ignore_errors: true
 
-    - name: Create container ring
-      command:
-        cmd: swift-ring-builder /etc/swift/{{ item.name }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours }}
-        creates: /etc/swift/{{ item.name }}.builder
-      loop: "{{ swift_container_rings }}"
+    - name: Manage container rings
+      swift_ring:
+        name: "{{ item.key }}"
+        backup: "{{ item.value['backup'] | default(swift_rings_backup) }}"
+        create: "{{ item.value['creates'] | default(swift_rings_create) }}"
+        devices: "{{ swift_devices }}"
+        min_part_hours: "{{ item.value['min_part_hours'] | default(swift_container_rings_min_part_hours) }}"
+        part_power: "{{ item.value['part_power'] | default(swift_container_rings_part_power) }}"
+        path: "{{ item.value['path'] | default(swift_rings_path) }}"
+        rebalance: "{{ item.value['rebalance'] | default(swift_rings_rebalance) }}"
+        replicas: "{{ item.value['replicas'] | default(swift_container_rings_replicas) }}"
+        validate: "{{ item.value['validate'] | default(swift_rings_validate) }}"
+      register: swift_result_container_rings
+      with_dict: "{{ swift_container_rings }}"
       delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
         - "inventory_hostname == groups['swift_admin'][0]"
-      ignore_errors: true
 
-    - name: Create object rings
-      command:
-        cmd: swift-ring-builder /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder create {{ item.part_power }} {{ item.replicas }} {{ item.min_part_hours }}
-        creates: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder
-      loop: "{{ swift_object_rings }}"
-      loop_control:
-        index_var: loop_index
+    - name: Manage object rings
+      swift_ring:
+        name: "{{ item.key }}"
+        backup: "{{ item.value['backup'] | default(swift_rings_backup) }}"
+        create: "{{ item.value['creates'] | default(swift_rings_create) }}"
+        devices: "{{ swift_devices }}"
+        min_part_hours: "{{ item.value['min_part_hours'] | default(swift_object_rings_min_part_hours) }}"
+        part_power: "{{ item.value['part_power'] | default(swift_object_rings_part_power) }}"
+        path: "{{ item.value['path'] | default(swift_rings_path) }}"
+        rebalance: "{{ item.value['rebalance'] | default(swift_rings_rebalance) }}"
+        replicas: "{{ item.value['replicas'] | default(swift_object_rings_replicas) }}"
+        validate: "{{ item.value['validate'] | default(swift_rings_validate) }}"
+      register: swift_result_object_rings
+      with_dict: "{{ swift_object_rings }}"
       delegate_to: "{{ groups['swift_admin'][0] }}"
       become: true
       become_user: "{{ swift_user }}"
       when:
         - "inventory_hostname == groups['swift_admin'][0]"
-      ignore_errors: true
-
-    ## TODO update to put devices in the right rings
-    - name: Add disks to rings
-      command:
-        cmd: |
-          swift-ring-builder
-          /etc/swift/{{ item.1.name }}.builder
-          add
-          --region {{ item.1.region |default(1) }}
-          --zone {{ item.1.zone |default(1) }}
-          --ip {{ swift_cluster_ip }}
-          {% if item.1.name == "account" %}
-          --port {{ item.1.port | default(swift_account_port) }}
-          {% elif item.1.name == "container" %}
-          --port {{ item.1.port | default(swift_container_port) }}
-          {% elif item.1.name == "object" %}
-          --port {{ item.1.port | default(swift_object_port) }}
-          {% endif %}
-          --device {{ item.0.disk.device.split('/') | last }}
-          --weight {{ item.1.weight |default(0) }}
-          --meta {{ item.0.disk.device if item.0.disk.device.startswith('/dev/') else '/dev/' + item.0.disk.device  }}
-      with_subelements:
-        - "{{ swift_rings_disks }}"
-        - disk.rings
-      delegate_to: "{{ groups['swift_admin'][0] }}"
-      when:
-        - "inventory_hostname in groups['swift_account'] or inventory_hostname in groups['swift_container'] or inventory_hostname in groups['swift_object']"
-      become: true
-      become_user: "{{ swift_user }}"
-      ignore_errors: true
-      register: result_add_disks
-      throttle: 1
-      failed_when: "'FAILED123' in result_add_disks.stderr"
   tags:
     - rings

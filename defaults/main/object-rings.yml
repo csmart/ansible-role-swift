@@ -1,13 +1,22 @@
 ---
+swift_object_rings_aliases:
+  - default
+swift_object_rings_default: true
+swift_object_rings_diskfile_module: 'egg:swift#replication.fs'
+swift_object_rings_min_part_hours: 1
+swift_object_rings_part_power: 17
+swift_object_rings_policy_type: replication
+swift_object_rings_replicas: 3
+
 swift_object_rings:
-  - name: object
-    part_power: "{{ swift_object_rings_part_power | default(17) }}"
-    default: "{{ swift_object_rings_default | default(true) }}"
-    replicas: "{{ swift_object_rings_replicas | default(3) }}"
-    min_part_hours: "{{ swift_object_rings_min_part_hours | default(0) }}"
-    aliases: "{{ swift_object_rings_aliases | default('yellow') }}"
-    policy_type: "{{ swift_object_rings_policy_type | default('replication') }}"
-    diskfile_module: "{{ swift_object_rings_diskfile_module | default('egg:swift#replication.fs') }}"
+  object:
+    part_power: "{{ swift_object_rings_part_power }}"
+    default: "{{ swift_object_rings_default }}"
+    replicas: "{{ swift_object_rings_replicas }}"
+    min_part_hours: "{{ swift_object_rings_min_part_hours }}"
+    aliases: "{{ swift_object_rings_aliases }}"
+    policy_type: "{{ swift_object_rings_policy_type }}"
+    diskfile_module: "{{ swift_object_rings_diskfile_module }}"
 #  - name: 3-replica-ssd
 #    part_power: 16
 #    default: false

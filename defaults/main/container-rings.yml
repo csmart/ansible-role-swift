@@ -1,6 +1,9 @@
 ---
+swift_container_rings_min_part_hours: 1
+swift_container_rings_part_power: 10
+swift_container_rings_replicas: 3
 swift_container_rings:
-  - name: container
-    part_power: "{{ swift_container_rings_part_power | default(10) }}"
-    replicas: "{{ swift_container_rings_replicas | default(3) }}"
-    min_part_hours: "{{ swift_container_rings_min_part_hours | default(0) }}"
+  container:
+    part_power: "{{ swift_container_rings_part_power }}"
+    replicas: "{{ swift_container_rings_replicas }}"
+    min_part_hours: "{{ swift_container_rings_min_part_hours }}"

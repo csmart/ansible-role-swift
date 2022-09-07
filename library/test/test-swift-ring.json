@@ -11,7 +11,7 @@
     "replicas": "1",
     "devices": {
       "0": {
-        "device": "/dev/sdb",
+        "disk": "/dev/sdb",
         "region": 1,
         "zone": 1,
         "rings": {
@@ -24,7 +24,7 @@
         }
       },
       "1": {
-        "device": "/dev/sdb",
+        "disk": "/dev/sdb",
         "region": 1,
         "zone": 1,
         "port": 8080,
@@ -37,7 +37,8 @@
         }
       },
       "2": {
-        "device": "/dev/sdb",
+        "disk": "/dev/sdb",
+        "device": "m2",
         "region": 1,
         "zone": 1,
         "port": 8080,
@@ -51,7 +52,7 @@
       },
       "3": {
         "note": "this will not get added as object-3 not in rings dict",
-        "device": "/dev/sdc",
+        "disk": "/dev/sdc",
         "region": 1,
         "zone": 1,
         "ip": "127.0.0.1",

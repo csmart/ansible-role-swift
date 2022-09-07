@@ -40,6 +40,16 @@ description: >
     zones and regions along with adding and managing devices as well as
     validation and rebalance.
 
+attributes:
+    check_mode:
+        support: none
+    diff_mode:
+        support: none
+    facts:
+        support: none
+    platform:
+        platforms: posix
+
 notes:
     - This module will require liberasurecode (such as `liberasurecode-devel`) and swift
 
@@ -97,36 +107,50 @@ options:
           - The device dict's key is the id number of the device, must be unique
           - The device dict must include the following required keys: [ device, ip, port, region, weight, zone ]
           - The device dict may include the following optional keys: [ meta ]
+        required: False
         type: dict
         suboptions:
             <int>:
                 type: dict
-                description: Dict containing device details, key is unique disk id
+                description: Dict containing device details, key is unique device id
+                required: False
             suboptions:
                 device:
                     type: str
-                    description: Full path to device, e.g. /dev/sdb
+                    description: Optional device name, defaults to d + device id, e.g. d0
+                    required: true
+                disk:
+                    type: str
+                    description: Full path to disk, e.g. /dev/sdb
+                    required: true
                 ip:
                     type: str
                     description: IP address of the host for this device
+                    required: true
                 meta:
                     type: str
                     description: Metadata for this device
+                    required: false
                 port:
                     type: int
                     description: Port the service for this disk listens on
+                    required: true
                 region:
                     type: int
                     description: The region this device is located in
+                    required: true
                 state:
                     type: str
                     description: Whether the device should be in the ring, defaults to True
+                    required: false
                 weight:
                     type: int
                     description: The weight of this device for this ring
+                    required: true
                 zone:
                     type: int
                     description: The zone this device is located in
+                    required: true
 """
 
 EXAMPLES = r"""
@@ -137,21 +161,21 @@ EXAMPLES = r"""
     replicas: 3
     devices:
       0:
-        device: "/dev/sdb"
+        disk: "/dev/sdb"
         ip: "127.0.0.1"
         port: 8080
         region: 1
         weight: 100.0
         zone: 1
       1:
-        device: "/dev/sdb"
+        disk: "/dev/sdb"
         ip: "127.0.0.2"
         port: 8080
         region: 1
         weight: 100.0
         zone: 1
       2:
-        device: "/dev/sdb"
+        disk: "/dev/sdb"
         ip: "127.0.0.3"
         port: 8080
         region: 1
@@ -392,7 +416,6 @@ def run_module():
     # Manage devices in the ring
     if devices:
         required_keys = (
-            "device",
             "id",
             "ip",
             "port",
@@ -401,6 +424,7 @@ def run_module():
             "zone",
         )
         optional_keys = (
+            "device",
             "meta",
             "replication_ip",
             "replication_port",
@@ -410,6 +434,14 @@ def run_module():
         dict_keys = "rings"
         missing_keys = ""
         for device, value in devices.items():
+            # Make sure we have a disk for this device
+            if "disk" not in value:
+                module.fail_json(
+                    msg="No disk is specified for device %s" % (device),
+                    **result
+                )
+                module.exit_json(**result)
+
             # Make sure we have rings for this device
             if "rings" not in value:
                 module.fail_json(
@@ -417,7 +449,7 @@ def run_module():
                 )
                 module.exit_json(**result)
 
-            # Ansible devices doesn't have an ID, but Swift ring structure wants one
+            # Swift ring structure needs an id, use Ansible devices sub keys
             value["id"] = int(device)
 
             # try and add/update the device in the ring
@@ -445,7 +477,7 @@ def run_module():
                     if k in float_keys and not isinstance(v, float):
                         value[k] = float(v)
 
-                # build device
+                # build device dict
                 # checks we have required keys at device or device.rings level
                 device_dict = {}
                 for key in required_keys:
@@ -456,6 +488,7 @@ def run_module():
                             device_dict[key] = value[key]
                         except:
                             missing_keys = missing_keys + key + " "
+
                 if missing_keys:
                     module.fail_json(
                         msg="Device missing required key(s): %s"
@@ -472,6 +505,9 @@ def run_module():
                             device_dict[key] = value[key]
                         except:
                             pass
+
+                if "device" not in device_dict:
+                    device_dict["device"] = "d" + str(device_dict["id"])
 
                 # check if device is already in the ring
                 existing_dev = None

@@ -1,48 +1,48 @@
 ---
-- name: Delete account ring
+- name: Delete account rings
   file:
-    path: /etc/swift/account.ring.gz
+    path: /etc/swift/{{ item.key }}.ring.gz
     state: absent
   become: true
   become_user: "{{ swift_user }}"
+  with_dict: "{{ swift_account_rings }}"
 
-- name: Delete container ring
+- name: Delete container rings
   file:
-    path: /etc/swift/container.ring.gz
+    path: /etc/swift/{{ item.key }}.ring.gz
     state: absent
   become: true
   become_user: "{{ swift_user }}"
+  with_dict: "{{ swift_container_rings }}"
 
 - name: Delete object rings
   file:
-    path: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.ring.gz
+    path: /etc/swift/{{ item.key }}.ring.gz
     state: absent
   become: true
   become_user: "{{ swift_user }}"
-  loop: "{{ swift_object_rings }}"
-  loop_control:
-    index_var: loop_index
+  with_dict: "{{ swift_object_rings }}"
 
 - name: Delete account builder
   file:
-    path: /etc/swift/account.builder
+    path: /etc/swift/{{ item.key }}.builder
     state: absent
   become: true
   become_user: "{{ swift_user }}"
+  with_dict: "{{ swift_account_rings }}"
 
 - name: Delete container builder
   file:
-    path: /etc/swift/container.builder
+    path: /etc/swift/{{ item.key }}.builder
     state: absent
   become: true
   become_user: "{{ swift_user }}"
+  with_dict: "{{ swift_container_rings }}"
 
 - name: Delete object builders
   file:
-    path: /etc/swift/{{ 'object' if loop_index == 0 else 'object' + "-" + (loop_index |string) }}.builder
+    path: /etc/swift/{{ item.key }}.builder
     state: absent
   become: true
   become_user: "{{ swift_user }}"
-  loop: "{{ swift_object_rings }}"
-  loop_control:
-    index_var: loop_index
+  with_dict: "{{ swift_object_rings }}"

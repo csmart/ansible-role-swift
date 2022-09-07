@@ -9,25 +9,31 @@
       min_part_hours: "{{ item.value['min_part_hours'] | default(0) }}"
       part_power: "{{ item.value['part_power'] }}"
       path: "{{ item.value['path'] }}"
-      rebalance: false
-      replicas: "{{ item.value['replicas'] }}"
-      validate: false
+      rebalance: true
+      replicas: 3
+      validate: true
     register: result_rings
-    with_dict: "{{ swift_rings }}"
+    with_dict:
+      - "{{ swift_account_rings }}"
+      - "{{ swift_container_rings }}"
+      - "{{ swift_object_rings }}"
 
   - name: Print result
     debug:
       msg: '{{ result_rings }}'
 
-  - name: Full ring at once
+  - name: Full rings at once
     swift_ring:
       name: "{{ item.key }}"
       devices: "{{ swift_devices }}"
       path: "{{ item.value['path'] }}"
       rebalance: true
       validate: true
-    with_dict: "{{ swift_rings }}"
     register: result_rings
+    with_dict:
+      - "{{ swift_account_rings }}"
+      - "{{ swift_container_rings }}"
+      - "{{ swift_object_rings }}"
 
   - name: Print result
     debug:
