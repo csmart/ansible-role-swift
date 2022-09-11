@@ -64,9 +64,9 @@
       mount:
         path: "/srv/node/{{ item.split()[1] }}"
         src: "LABEL={{ item.split()[1][-12:] }}"
-        fstype: xfs
+        fstype: "{{ swift_drive_filesystem }}"
         state: mounted
-        opts: "rw,noatime,nodiratime,seclabel,attr2,inode64,logbufs=8,sunit=512,swidth=512,noquota"
+        opts: "{% for option in swift_drive_mount_options %}{{ option }}{% if not loop.last %},{% endif %}{% endfor %}"
       become: true
       with_items: "{{ swift_disks_list }}"
       when:
