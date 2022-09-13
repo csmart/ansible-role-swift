@@ -1,0 +1,14 @@
+---
+swift_disk_filesystem: xfs
+swift_disk_mount_options:
+  - rw
+  - noatime
+  - nodiratime
+  - seclabel
+  - attr2
+  - inode64
+  - logbufs=8
+  - sunit=512
+  - swidth=512
+  - noquota
+  - nofail
