@@ -1,7 +1,9 @@
 ---
 - name: Install dependencies for SELinux module
   dnf:
-    name: python3-libselinux
+    name:
+      - python3-libselinux
+      - python3-libsemanage
     state: present
   register: dnf_selinux_result
   retries: "{{ swift_retries }}"

@@ -12,6 +12,8 @@ swift_common_repos:
 swift_common_deps:
   - centos-release-openstack-wallaby
 
+swift_custom_deps: []
+
 swift_common_packages:
   - crudini
   - git

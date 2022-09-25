@@ -1,4 +1,17 @@
 ---
+- name: Install custom dependencies
+  package:
+    name: "{{ swift_custom_deps }}"
+    state: present
+  become: true
+  register: result_swift_custom_deps_install
+  retries: "{{ swift_retries }}"
+  delay: "{{ swift_delay }}"
+  until: result_swift_custom_deps_install is succeeded
+  tags:
+    - common
+    - packages
+
 - name: Install common dependencies
   package:
     name: "{{ swift_common_deps }}"
