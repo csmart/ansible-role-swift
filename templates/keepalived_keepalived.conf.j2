@@ -26,7 +26,7 @@ vrrp_instance VI_{{ vip }} {
     state BACKUP
     priority {{ 100 - loop.index0 }}
 {% endif %}
-    interface eth0
+    interface {% for net in ansible_interfaces %}{% if hostvars[inventory_hostname]['ansible_' + net]['ipv4']['address'] | default('127.0.0.1') | ipaddr(swift_outward_ip) %}{{ net + '\n' }}{% endif %}{% endfor %}
     virtual_router_id {{ vip }}
     advert_int 1
     authentication {

@@ -41,3 +41,17 @@
   tags:
     - prep
     - firewall
+
+- name: Add rich rules to firewall zone
+  firewalld:
+    rich_rule: "{{ item }}"
+    zone: "{{ swift_firewall_zone }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - "rule family='ipv4' source address='{{ swift_outward_subnet }}' protocol value='vrrp' accept"
+  become: true
+  tags:
+    - prep
+    - firewall
